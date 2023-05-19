@@ -1,2 +1,2 @@
-# Info-loss-ABSA
-Info-loss-ABSA
+# InfoNCE-ABSA
+InfoNCE-ABSA
