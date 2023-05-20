@@ -221,7 +221,7 @@ class HI_ASA(nn.Module):
         self.activation = nn.Tanh()
         self.activation_sigmoid = nn.Sigmoid()
         self.classifier = nn.Linear(2*args.hidden_size, 5)
-        self.temperature = 0.5
+        self.temperature = args.temp_value
         self.use_deep_share = args.use_deep_share
         self.use_static_temperature = args.use_static_temperature
         self.use_si = args.use_si
@@ -239,7 +239,7 @@ class HI_ASA(nn.Module):
 
     def forward(self, mode, attention_mask, input_ids=None, token_type_ids=None, start_positions=None, end_positions=None, aspect_num=None,
                 span_aspect_num=None, span_starts=None, span_ends=None, polarity_labels=None, label_masks=None, sequence_input=None,
-                weight_kl=None, weight_si=None, n_best_size = None, logit_threshold =None, scl_label=None, max_temperature=None, min_temperature=None):
+                weight_kl=None, weight_si=None, weight_temp=None, n_best_size = None, logit_threshold =None, scl_label=None, max_temperature=None, min_temperature=None):
         if mode == 'train':
             assert input_ids is not None and token_type_ids is not None
             all_encoder_layers, _ = self.bert(input_ids, token_type_ids, attention_mask)
@@ -283,9 +283,17 @@ class HI_ASA(nn.Module):
                                     min_temperature=min_temperature)
                 # print(f"hidden_ac: {hidden_ac.size()}")
                 if self.use_static_temperature:
-                    sim_loss, _ = infoNCE_loss(sequence_output_ate, sequence_output_atc, sequence_output_ate, sequence_output_atc, use_static_temperature=self.use_static_temperature)
+                    sim_loss = infoNCE_loss(sequence_output_ate,
+                                            sequence_output_atc,
+                                            sequence_output_ate,
+                                            sequence_output_atc,
+                                            use_static_temperature=self.use_static_temperature,
+                                            temp_value = self.temperature)
                 else:
-                    sim_loss, at_loss = infoNCE_loss(sequence_output_ate, sequence_output_atc, sequence_output_ate, sequence_output_atc, use_static_temperature=self.use_static_temperature)
+                    sim_loss, at_loss = infoNCE_loss(sequence_output_ate,
+                                                     sequence_output_atc,
+                                                     sequence_output_ate,
+                                                     sequence_output_atc)
 
             start_logits = self.start_outputs(sequence_output_ate)   # [batch_size, seq_len, 1]
             start_logits = start_logits.squeeze(-1)
@@ -359,7 +367,7 @@ class HI_ASA(nn.Module):
             if self.use_deep_share:
                 return ae_loss + ac_loss + weight_kl * mutual_loss
             if self.use_si:
-                return ae_loss + ac_loss + (sim_loss + at_loss) * float(weight_si)
+                return ae_loss + ac_loss + (sim_loss) * float(weight_si) +  float(weight_temp) * at_loss
             else:
                 return ae_loss + ac_loss
 

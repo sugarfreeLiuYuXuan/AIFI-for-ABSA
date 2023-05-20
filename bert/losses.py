@@ -4,9 +4,6 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from torch import nn
-import inspect, re
-
-
 
 
 __all__ = ['InfoNCE']
@@ -32,7 +29,7 @@ class InfoNCE(nn.Module):
         self.scl_label = scl_label
 
     def forward(self, query, positive_key, v_ac, v_ae, negative_keys=None,
-                reduction='mean', negative_mode='unpaired', use_static_temperature=False):
+                reduction='mean', negative_mode='unpaired', use_static_temperature=False, temp_value=None):
         # Check input dimensionality.
         # print(f"query: {query.size()}{query.requires_grad}")
         # print(f"positive_key: {positive_key.size()}{positive_key.requires_grad}")
@@ -96,7 +93,7 @@ class InfoNCE(nn.Module):
             labels = torch.arange(len(query), device=query.device)
             
         if(use_static_temperature is True):
-            temperature = 0.1
+            temperature = temp_value
             return F.cross_entropy(logits / temperature, labels, reduction=reduction)
         else:
             # Train Adaptive Temperature
@@ -108,11 +105,12 @@ class InfoNCE(nn.Module):
             adaptive_temperature = adaptive_temperature.to('cuda')
             adaptive_temperature = self.mlp_layers(adaptive_temperature).to('cuda')
             at_loss = F.cross_entropy(adaptive_temperature, self.scl_label.long())
-        
+            # print(adaptive_temperature, self.scl_label)
             adaptive_temperature, _ = torch.max(adaptive_temperature, dim=1)
             adaptive_temperature = adaptive_temperature.unsqueeze(1).expand(-1, logits.shape[0])
             # temperature = (self.max_temperature - self.min_temperature) * (adaptive_temperature)/2 + self.min_temperature
             temperature = (self.max_temperature - self.min_temperature) * (adaptive_temperature)/2 + self.min_temperature
+            # print(temperature)
             # show_info(temperature)
             # self.scl_label = torch.where(self.scl_label == 2, torch.tensor(1), self.scl_label)
             return F.cross_entropy(logits / temperature, labels, reduction=reduction), at_loss

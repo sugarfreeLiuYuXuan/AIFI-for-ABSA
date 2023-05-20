@@ -151,7 +151,7 @@ def run_train_epoch(args, global_step, model, param_optimizer,
                      start_positions=start_positions, end_positions=end_positions,aspect_num=aspect_num,
                      span_starts=span_starts, span_ends=span_ends, span_aspect_num=span_aspect_num,
                      polarity_labels=labels, label_masks=label_masks,n_best_size = args.n_best_size,
-                     weight_kl=args.weight_kl, weight_si=args.weight_si,logit_threshold = args.logit_threshold,
+                     weight_kl=args.weight_kl, weight_si=args.weight_si, weight_temp=args.weight_temp, logit_threshold = args.logit_threshold,
                      scl_label=scl_label, max_temperature=args.max_temperature, min_temperature=args.min_temperature)
         loss = post_process_loss(args, n_gpu, loss)
         loss.backward()
@@ -347,10 +347,12 @@ def main():
     parser.add_argument("--gpu_id", default=1, type=str)
     parser.add_argument("--use_si", action='store_true')
     parser.add_argument("--use_static_temperature", action='store_true')
+    parser.add_argument("--temp_value", default=0.1, type=float)
     parser.add_argument("--use_deep_share", action='store_true')
     parser.add_argument("--max_temperature", default=1, type=float)
     parser.add_argument("--min_temperature", default=0.05, type=float)
     parser.add_argument("--weight_si", default=0.1, type=str)
+    parser.add_argument("--weight_temp", default=0.1, type=str)
     parser.add_argument("--weight_kl", default=0.1, type=float)
     parser.add_argument("--shared_weight", default=0.1, type=float, required = True )
     parser.add_argument("--learning_rate", default=3e-5, type=float, required = True)

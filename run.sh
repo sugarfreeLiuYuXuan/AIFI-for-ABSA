@@ -10,8 +10,8 @@ nohup python -m main.run_joint_span \
   --max_temperature 1 \
   --min_temperature 0.05 \
   --use_si \
-  --use_static_temperature \
-  --weight_si 0.1 \
+  --weight_si 0.15 \
+  --weight_temp 0.1 \
   --weight_kl 0.1 \
   --shared_weight 0.1 \
   --num_train_epochs 80 \
