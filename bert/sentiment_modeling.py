@@ -367,7 +367,7 @@ class HI_ASA(nn.Module):
             if self.use_deep_share:
                 return ae_loss + ac_loss + weight_kl * mutual_loss
             if self.use_si:
-                return ae_loss + ac_loss + (sim_loss) * float(weight_si) +  float(weight_temp) * at_loss
+                return ae_loss + ac_loss + float(weight_si) * sim_loss +  float(weight_temp) * at_loss
             else:
                 return ae_loss + ac_loss
 

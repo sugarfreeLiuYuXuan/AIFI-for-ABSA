@@ -1,5 +1,6 @@
 .DS_Store
 cache_bert*/
+cache_bert/
 image/
 # outputs*/
 # OUT/
@@ -10,5 +11,6 @@ __pycache__/
 build/
 dist/
 bin/
+OUT/
 
 

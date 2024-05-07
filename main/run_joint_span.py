@@ -348,7 +348,7 @@ def main():
     parser.add_argument("--use_si", action='store_true')
     parser.add_argument("--use_static_temperature", action='store_true')
     parser.add_argument("--temp_value", default=0.1, type=float)
-    parser.add_argument("--use_deep_share", action='store_true')
+    parser.add_argument("--use_deep_share", action='store_true', help='only use deep share expert network')
     parser.add_argument("--max_temperature", default=1, type=float)
     parser.add_argument("--min_temperature", default=0.05, type=float)
     parser.add_argument("--weight_si", default=0.1, type=str)
