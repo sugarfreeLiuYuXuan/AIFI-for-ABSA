@@ -7,7 +7,7 @@ This repo contains the data and code for our paper [Modeling Adaptive Inter-Task
 - numpy==1.24.3
 - six==1.16.0
 - torch==2.1.2
-- ==transformers==4.36.2
+- transformers==4.36.2
 
 Or you can install it directly with the command:
 
@@ -83,7 +83,7 @@ python -m main.run_joint_span \
 
 Note that 10 cross-validations are required on the **twitter** dataset here, and all the final results need to be averaged.
 
-More details can be found in the paper and the help info in the `main.py`.
+More details can be found in the paper and the help info in the `main/run_joint_span.py`.
 
 ## Citation
 
